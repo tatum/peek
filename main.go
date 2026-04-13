@@ -16,6 +16,7 @@ func main() {
 		themeName  string
 		noLines    bool
 		forceColor bool
+		useFzf     bool
 	)
 
 	flag.BoolVar(&pager, "p", false, "open in pager mode")
@@ -27,6 +28,8 @@ func main() {
 	flag.BoolVar(&noLines, "n", false, "hide line numbers")
 	flag.BoolVar(&noLines, "no-lines", false, "hide line numbers")
 	flag.BoolVar(&forceColor, "force-color", false, "force color output when piped")
+	flag.BoolVar(&useFzf, "z", false, "pick a file with fzf, then peek it")
+	flag.BoolVar(&useFzf, "fzf", false, "pick a file with fzf, then peek it")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: peek [flags] [file...]\n\nFlags:\n")
@@ -41,6 +44,19 @@ func main() {
 	th := resolveThemeFromEnv(themeName)
 
 	files := flag.Args()
+
+	if useFzf {
+		picked, err := runFzf(lang, themeName, noLines)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "peek: %v\n", err)
+			os.Exit(1)
+		}
+		if picked == "" {
+			return
+		}
+		files = []string{picked}
+	}
+
 	if len(files) == 0 {
 		// Read from stdin
 		if err := processReader(os.Stdin, "stdin", lang, th, !noLines, pager, noColor, isTTY, forceColor); err != nil {
