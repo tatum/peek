@@ -6,6 +6,18 @@ image previews in terminals that speak the
 
 ## Install
 
+### Prebuilt binary (no Go required)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tatum/peek/main/install.sh | sh
+```
+
+Downloads a static binary for your platform (linux/amd64, linux/arm64,
+darwin/arm64) from the rolling [`latest`
+release](https://github.com/tatum/peek/releases/tag/latest) into
+`~/.local/bin` — no sudo, no toolchain. Set `PEEK_INSTALL_DIR` to install
+elsewhere. Binaries are rebuilt by CI on every push to `main`.
+
 ### From source
 
 Requires Go 1.25+.
@@ -14,19 +26,20 @@ Requires Go 1.25+.
 go install github.com/tatum/peek@latest
 ```
 
-### Build locally
+### From a clone
 
 ```sh
 git clone https://github.com/tatum/peek.git
 cd peek
-go build -o peek .
+make install
 ```
 
-Move the binary somewhere on your `$PATH`:
+This runs `go install .`, which puts the binary in `$(go env GOPATH)/bin`
+(usually `~/go/bin`) — make sure that's on your `$PATH`. No sudo needed.
+`make uninstall` removes it.
 
-```sh
-mv peek /usr/local/bin/
-```
+To just build a local binary without installing, run `make` (or
+`go build -o peek .`).
 
 ## Usage
 
